@@ -12,14 +12,19 @@ void creer_image()
 {
     Image img;
     int r, g, b;
-    printf("entrer la hauteur de l'image : ");
-    scanf("%d", &img.hauteur);
-    getchar();
     printf("entrer la largeur de l'image : ");
     scanf("%d", &img.largeur);
-    printf("p3\n");
-    printf("%d %d,\n ", img.hauteur, img.largeur);
-    printf("255\n");
+    getchar();
+    printf("entrer la hauteur de l'image : ");
+    scanf("%d", &img.hauteur);
+
+    FILE *fichier = fopen("image.ppm", "w");
+    if (fichier == NULL)
+    {
+        printf("Erreur lors de la création du fichier.\n");
+        return;
+    }
+    fprintf(fichier, "p3\n%d %d\n255\n", img.largeur, img.hauteur);
 
     for (int i = img.hauteur - 1; i >= 0; i--)
     {
@@ -27,14 +32,18 @@ void creer_image()
         {
             float r = (float)j / (float)img.hauteur;
             float g = (float)i / (float)img.largeur;
-            b = 2.5;
+            float b = 0.2;
             int ir = (int)(r * 255.99);
             int ig = (int)(g * 255.99);
             int ib = (int)(b * 255.99);
 
-            printf("%d %d %d\n", ir, ig, ib);
+            fprintf(fichier, "%d %d  %d", ir, ig, ib);
         }
+        if(i > 0)
+            fprintf(fichier, "\n"); 
     }
+    fclose(fichier); 
+    printf("Image générée et enregistrée dans 'image.ppm'\n");
 }
 
 int main()
