@@ -2,9 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-// --- 1. Structures BMP ---
-
-// Utiliser #pragma pack(push, 1) pour éviter le padding (rembourrage) des structures.
+.
 #pragma pack(push, 1)
 
 typedef struct {
@@ -12,7 +10,7 @@ typedef struct {
     uint32_t bfSize;      // Taille totale du fichier
     uint16_t bfReserved1;
     uint16_t bfReserved2;
-    uint32_t bfOffBits;   // Offset vers les données de pixels
+    uint32_t bfOffBits;   
 } BMPFileHeader;
 
 typedef struct {
@@ -29,7 +27,7 @@ typedef struct {
     uint32_t biClrImportant;
 } BMPInfoHeader;
 
-// Pixel stocké en BGR (Bleu, Vert, Rouge) en 24 bits
+
 typedef struct {
     uint8_t blue;
     uint8_t green;
