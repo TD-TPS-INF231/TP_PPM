@@ -7,11 +7,18 @@ typedef struct
     int hauteur;
     int largeur;
 } Image;
+typedef struct 
+{
+    int r;
+    int g;
+    int b;
+}Pixel;
+
 
 void creer_image()
 {
     Image img;
-    int r, g, b;
+    Pixel couleur;
     printf("entrer la largeur de l'image : ");
     scanf("%d", &img.largeur);
     getchar();
@@ -37,6 +44,10 @@ void creer_image()
             int ig = (int)(g * 255.99);
             int ib = (int)(b * 255.99);
 
+            couleur.r = ir;
+            couleur.g = ig;
+            couleur.b = ib;
+
             fprintf(fichier, "%d %d %d ", ir, ig, ib);
         }
         if(i > 0)
@@ -44,6 +55,10 @@ void creer_image()
     }
     fclose(fichier); 
     printf("Image générée et enregistrée dans 'image.ppm'\n");
+}
+
+void Filtre_Median(int tab[], int n){
+
 }
 
 int main()
