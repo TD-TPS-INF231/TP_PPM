@@ -24,7 +24,7 @@ void creer_image()
         printf("Erreur lors de la création du fichier.\n");
         return;
     }
-    fprintf(fichier, "p3\n%d %d\n255\n", img.largeur, img.hauteur);
+    fprintf(fichier, "P3\n%d %d\n255\n", img.largeur, img.hauteur);
 
     for (int i = img.hauteur - 1; i >= 0; i--)
     {
@@ -37,10 +37,10 @@ void creer_image()
             int ig = (int)(g * 255.99);
             int ib = (int)(b * 255.99);
 
-            fprintf(fichier, "%d %d  %d", ir, ig, ib);
+            fprintf(fichier, "%d %d %d ", ir, ig, ib);
         }
         if(i > 0)
-            fprintf(fichier, "\n"); 
+            fprintf(fichier, "\n");
     }
     fclose(fichier); 
     printf("Image générée et enregistrée dans 'image.ppm'\n");
