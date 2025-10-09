@@ -45,6 +45,50 @@ void creer_image()
     fclose(fichier); 
     printf("Image générée et enregistrée dans 'image.ppm'\n");
 }
+void noir_et_blanc()
+{
+    FILE *fichier = fopen("image.ppm", "r");
+    if (fichier == NULL)
+    {
+        printf("Erreur lors de l'ouverture du fichier.\n");
+        return;
+    }
+
+    char format[3];
+    int largeur, hauteur, maxval;
+
+    fscanf(fichier, "%s", format);
+    fscanf(fichier, "%d %d", &largeur, &hauteur);
+    fscanf(fichier, "%d", &maxval);
+
+    FILE *fichier_nb = fopen("image_nb.ppm", "w");
+    if (fichier_nb == NULL)
+    {
+        printf("Erreur lors de la création du fichier noir et blanc.\n");
+        fclose(fichier);
+        return;
+    }
+
+    fprintf(fichier_nb, "P3\n%d %d\n%d\n", largeur, hauteur, maxval);
+
+    for (int i = 0; i < hauteur; i++)
+    {
+        for (int j = 0; j < largeur; j++)
+        {
+            int r, g, b;
+            fscanf(fichier, "%d %d %d", &r, &g, &b);
+            int gray = (r + g + b) / 3;
+            fprintf(fichier_nb, "%d %d %d ", gray, gray, gray);
+        }
+        fprintf(fichier_nb, "\n");
+    }
+
+    fclose(fichier);
+    fclose(fichier_nb);
+    printf("Image noir et blanc générée et enregistrée dans 'image_nb.ppm'\n");
+}
+
+
 
 int main()
 {
@@ -71,6 +115,10 @@ int main()
             break;
         case 0:
             printf("Aurevoir\n");
+            break;
+        case 3:
+            printf("noir et blanc\n");
+            noir_et_blanc();
             break;
         default:
             printf("choix indisponible\n");
