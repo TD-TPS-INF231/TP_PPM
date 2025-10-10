@@ -5,7 +5,7 @@
 // Définition de la valeur maximale pour une composante de couleur 8 bits
 #define MAX_VALEUR 255
 
-/ Structure pour représenter une couleur (un pixel)
+// Structure pour représenter une couleur (un pixel)
 typedef struct {
     unsigned char rouge;
     unsigned char vert;
