@@ -78,8 +78,23 @@ Couleur creer_negatif(Couleur originale) {
     negatif.rouge = MAX_VALEUR - originale.rouge;
     negatif.vert  = MAX_VALEUR - originale.vert;
     negatif.bleu  = MAX_VALEUR - originale.bleu;
+
+
+    Couleur couleur_originale = {200, 50, 100};
+
+    // 2. Appeler la fonction pour obtenir le négatif
+    Couleur couleur_negative = creer_negatif(couleur_originale);
+
     
-    return negatif;
+
+    // 3. Afficher les résultats
+    printf("--- Composantes Couleurs ---\n");
+    printf("Originale (R, V, B) : (%u, %u, %u)\n", 
+           couleur_originale.rouge, couleur_originale.vert, couleur_originale.bleu);
+    printf("Négative (R, V, B) :  (%u, %u, %u)\n", 
+           couleur_negative.rouge, couleur_negative.vert, couleur_negative.bleu);
+
+    return 0;
 }
 
 
@@ -242,6 +257,8 @@ int main()
             creer_image();
             break;
         case 3:
+            printf("3.le negatif de l'image \n");
+
         case 0:
             printf("Aurevoir\n");
             break;
