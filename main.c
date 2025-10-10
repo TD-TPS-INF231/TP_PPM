@@ -219,11 +219,11 @@ int main()
             printf("voici l'image utiliser\n");
             creer_image();
             break;
-            case 2:
+            case 4:
             printf("voici le négatif de l'image\n");
             creer_negatif_image();
             break;
-            case 3:
+            case 6:
             printf("voici votre image découper");
             decouper_partie_image();
             break;
