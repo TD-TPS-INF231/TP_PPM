@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+#include<string.h>
 #include <stdlib.h>
 
 typedef struct
@@ -56,11 +56,87 @@ void creer_image()
     fclose(fichier); 
     printf("Image générée et enregistrée dans 'image.ppm'\n");
 }
-
-void Filtre_Median(int tab[], int n){
-
+void eclaircir_image() {
+    char nom_sortie[100];
+    int intensite;
+    
+    // Utilise directement l'image créée par creer_image()
+    char* nom_entree = "image.ppm";
+    
+    printf("Entrer le nom du fichier résultat: ");
+    scanf("%s", nom_sortie);
+    printf("Entrer l'intensité d'éclaircissement (0-100): ");
+    scanf("%d", &intensite);
+    
+    // Ouvrir les fichiers
+    FILE *fichier_entree = fopen(nom_entree, "r");
+    FILE *fichier_sortie = fopen(nom_sortie, "w");
+    
+    if (fichier_entree == NULL) {
+        printf("Erreur: Le fichier 'image.ppm' n'existe pas\n");
+        printf("Veuillez d'abord créer une image avec l'option 1\n");
+        return;
+    }
+    
+    if (fichier_sortie == NULL) {
+        printf("Erreur: Impossible de créer le fichier %s\n", nom_sortie);
+        fclose(fichier_entree);
+        return;
+    }
+    
+    // Lire l'en-tête PPM
+    char format[3];
+    int largeur, hauteur, valeur_max;
+    fscanf(fichier_entree, "%s", format);
+    fscanf(fichier_entree, "%d %d", &largeur, &hauteur);
+    fscanf(fichier_entree, "%d", &valeur_max);
+    
+    // Vérifier le format
+    if (strcmp(format, "P3") != 0) {
+        printf("Erreur: Format PPM non supporté\n");
+        fclose(fichier_entree);
+        fclose(fichier_sortie);
+        return;
+    }
+    
+    // Écrire l'en-tête dans le fichier de sortie
+    fprintf(fichier_sortie, "P3\n%d %d\n%d\n", largeur, hauteur, valeur_max);
+    
+    // Traiter chaque pixel
+    int r, g, b;
+    
+    for (int i = 0; i < hauteur; i++) {
+        for (int j = 0; j < largeur; j++) {
+            // Lire les valeurs RGB
+            fscanf(fichier_entree, "%d %d %d", &r, &g, &b);
+            
+            // Appliquer l'éclaircissement
+            r = r + intensite;
+            g = g + intensite;
+            b = b + intensite;
+            
+            // Limiter les valeurs entre 0 et 255
+            if (r > 255) r = 255;
+            if (g > 255) g = 255;
+            if (b > 255) b = 255;
+            if (r < 0) r = 0;
+            if (g < 0) g = 0;
+            if (b < 0) b = 0;
+            
+            // Écrire les nouvelles valeurs
+            fprintf(fichier_sortie, "%d %d %d ", r, g, b);
+        }
+        fprintf(fichier_sortie, "\n");
+    }
+    
+    fclose(fichier_entree);
+    fclose(fichier_sortie);
+    
+    printf("Image éclaircie avec succès!\n");
+    printf("Fichier source: image.ppm (créé avec l'option 1)\n");
+    printf("Fichier résultat: %s\n", nom_sortie);
+    printf("Intensité appliquée: %d\n", intensite);
 }
-
 // Fonction pour créer le négatif d'une image
 void creer_negatif_image()
 {
@@ -196,7 +272,7 @@ void decouper_partie_image()
     printf("Decoupage reussi ! Partie enregistree dans : %s\n", nom_fichier_sortie);
     printf("Nouvelle taille : %d x %d pixels\n", nouvelle_largeur, nouvelle_hauteur);
 }
-int main()
+int main(int argc, char* argv[])
 {
     int choix;
     do
@@ -218,6 +294,9 @@ int main()
         case 1:
             printf("voici l'image utiliser\n");
             creer_image();
+            break;
+            case 2:
+        eclaircir_image();  // Utilise image.ppm créé précédemment
             break;
         case 0:
             printf("Aurevoir\n");
