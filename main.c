@@ -1,104 +1,231 @@
 #include <stdio.h>
+
 #include <stdlib.h>
-#include <stdint.h>
 
-.
-#pragma pack(push, 1)
-
-typedef struct {
-    uint16_t bfType;      // Signature 'BM' (0x4D42)
-    uint32_t bfSize;      // Taille totale du fichier
-    uint16_t bfReserved1;
-    uint16_t bfReserved2;
-    uint32_t bfOffBits;   
-} BMPFileHeader;
-
-typedef struct {
-    uint32_t biSize;          // Taille de ce header (40)
-    int32_t  biWidth;         // Largeur
-    int32_t  biHeight;        // Hauteur
-    uint16_t biPlanes;
-    uint16_t biBitCount;      // Bits par pixel (doit être 24 ici)
-    uint32_t biCompression;   // Doit être 0
-    uint32_t biSizeImage;
-    int32_t  biXPelsPerMeter;
-    int32_t  biYPelsPerMeter;
-    uint32_t biClrUsed;
-    uint32_t biClrImportant;
-} BMPInfoHeader;
+typedef struct
+{
+    int hauteur;
+    int largeur;
+} Image;
+typedef struct 
+{
+    int r;
+    int g;
+    int b;
+}Pixel;
 
 
-typedef struct {
-    uint8_t blue;
-    uint8_t green;
-    uint8_t red;
-} Pixel;
+void creer_image()
+{
+    Image img;
+    Pixel couleur;
+    printf("entrer la largeur de l'image : ");
+    scanf("%d", &img.largeur);
+    getchar();
+    printf("entrer la hauteur de l'image : ");
+    scanf("%d", &img.hauteur);
 
-#pragma pack(pop)
-
-// --- 2. Fonction de Filtre ---
-
-/**
- * Applique le filtre négatif à l'image.
- * Pour chaque composante de couleur (R, G, B), calcule 255 - valeur_actuelle.
- */
-void applyNegativeFilter(Pixel* pixels, int width, int height) {
-    if (!pixels) return;
-
-    long total_pixels = (long)width * height;
-
-    for (long i = 0; i < total_pixels; ++i) {
-        // Négatif pour la composante Bleue
-        pixels[i].blue = 255 - pixels[i].blue;
-        
-        // Négatif pour la composante Verte
-        pixels[i].green = 255 - pixels[i].green;
-        
-        // Négatif pour la composante Rouge
-        pixels[i].red = 255 - pixels[i].red;
+    FILE *fichier = fopen("image.ppm", "w");
+    if (fichier == NULL)
+    {
+        printf("Erreur lors de la création du fichier.\n");
+        return;
     }
+    fprintf(fichier, "P3\n%d %d\n255\n", img.largeur, img.hauteur);
+
+    for (int i = img.hauteur - 1; i >= 0; i--)
+    {
+        for (int j = 0; j < img.largeur; j++)
+        {
+            float r = (float)j / (float)img.hauteur;
+            float g = (float)i / (float)img.largeur;
+            float b = 0.2;
+            int ir = (int)(r * 255.99);
+            int ig = (int)(g * 255.99);
+            int ib = (int)(b * 255.99);
+
+            couleur.r = ir;
+            couleur.g = ig;
+            couleur.b = ib;
+
+            fprintf(fichier, "%d %d %d ", ir, ig, ib);
+        }
+        if(i > 0)
+            fprintf(fichier, "\n");
+    }
+    fclose(fichier); 
+    printf("Image générée et enregistrée dans 'image.ppm'\n");
 }
 
-// --- 3. Fonctions Utilitaire (Lecture/Écriture) ---
+void Filtre_Median(int tab[], int n){
 
-Pixel* loadImageBMP(const char* filename, BMPFileHeader* fileHeader, BMPInfoHeader* infoHeader);
-void saveImageBMP(const char* filename, const BMPFileHeader* fileHeader, const BMPInfoHeader* infoHeader, const Pixel* pixels);
+}
 
-// NOTE: Le corps des fonctions loadImageBMP et saveImageBMP est omis ici pour la concision, 
-// mais il doit être le même que dans la réponse précédente pour gérer les headers et le padding.
-
-// --- 4. Fonction Principale (main) ---
-int main() {
-    const char* INPUT_FILE = "input.bmp";
-    const char* OUTPUT_FILE = "output_negative.bmp";
-
-    BMPFileHeader fileHeader;
-    BMPInfoHeader infoHeader;
-    Pixel* pixels = NULL;
-
-    printf("--- Programme de création de négatif d'image ---\n");
+// Fonction pour créer le négatif d'une image
+void creer_negatif_image()
+{
+    char nom_fichier_entree[100];
+    char nom_fichier_sortie[100];
     
-    // 1. Chargement de l'image (Assurez-vous que cette fonction est bien définie)
-    pixels = loadImageBMP(INPUT_FILE, &fileHeader, &infoHeader);
+    printf("Entrer le nom du fichier image source : ");
+    scanf("%s", nom_fichier_entree);
+    printf("Entrer le nom du fichier resultat : ");
+    scanf("%s", nom_fichier_sortie);
 
-    if (pixels == NULL) {
-        fprintf(stderr, "Échec du chargement de l'image ou format non supporté.\n");
-        return 1;
+    FILE *fichier_entree = fopen(nom_fichier_entree, "r");
+    FILE *fichier_sortie = fopen(nom_fichier_sortie, "w");
+    
+    if (fichier_entree == NULL || fichier_sortie == NULL)
+    {
+        printf("Erreur : Impossible d'ouvrir les fichiers\n");
+        return;
     }
 
-    printf("Image chargée : %d x %d pixels.\n", infoHeader.biWidth, infoHeader.biHeight);
+    // Lire l'en-tête du fichier PPM
+    char format[3];
+    int largeur, hauteur, valeur_max;
+    fscanf(fichier_entree, "%s", format);
+    fscanf(fichier_entree, "%d %d", &largeur, &hauteur);
+    fscanf(fichier_entree, "%d", &valeur_max);
 
-    // 2. Application du filtre
-    printf("Application du filtre négatif...\n");
-    applyNegativeFilter(pixels, infoHeader.biWidth, infoHeader.biHeight);
+    // Écrire l'en-tête dans le fichier de sortie
+    fprintf(fichier_sortie, "%s\n", format);
+    fprintf(fichier_sortie, "%d %d\n", largeur, hauteur);
+    fprintf(fichier_sortie, "%d\n", valeur_max);
 
-    // 3. Sauvegarde de l'image
-    saveImageBMP(OUTPUT_FILE, &fileHeader, &infoHeader, pixels);
+    // Traiter chaque pixel pour créer le négatif
+    Pixel pixel_courant;
+    for (int i = 0; i < hauteur; i++)
+    {
+        for (int j = 0; j < largeur; j++)
+        {
+            fscanf(fichier_entree, "%d %d %d", &pixel_courant.r, &pixel_courant.g, &pixel_courant.b);
+            
+            // Calcul du négatif : soustraire de la valeur maximale
+            pixel_courant.r = valeur_max - pixel_courant.r;
+            pixel_courant.g = valeur_max - pixel_courant.g;
+            pixel_courant.b = valeur_max - pixel_courant.b;
+            
+            fprintf(fichier_sortie, "%d %d %d ", pixel_courant.r, pixel_courant.g, pixel_courant.b);
+        }
+        fprintf(fichier_sortie, "\n");
+    }
 
-    printf("Image négative enregistrée sous '%s'.\n", OUTPUT_FILE);
+    fclose(fichier_entree);
+    fclose(fichier_sortie);
     
-    // 4. Nettoyage de la mémoire
-    free(pixels); 
+    printf("Negatif cree avec succes dans : %s\n", nom_fichier_sortie);
+}
+
+// Fonction pour découper une partie de l'image
+void decouper_partie_image()
+{
+    char nom_fichier_entree[100];
+    char nom_fichier_sortie[100];
+    int ligne_debut, ligne_fin, colonne_debut, colonne_fin;
     
+    printf("Entrer le nom du fichier image source : ");
+    scanf("%s", nom_fichier_entree);
+    printf("Entrer la ligne de debut : ");
+    scanf("%d", &ligne_debut);
+    printf("Entrer la ligne de fin : ");
+    scanf("%d", &ligne_fin);
+    printf("Entrer la colonne de debut : ");
+    scanf("%d", &colonne_debut);
+    printf("Entrer la colonne de fin : ");
+    scanf("%d", &colonne_fin);
+    printf("Entrer le nom du fichier resultat : ");
+    scanf("%s", nom_fichier_sortie);
+
+    FILE *fichier_entree = fopen(nom_fichier_entree, "r");
+    FILE *fichier_sortie = fopen(nom_fichier_sortie, "w");
+    
+    if (fichier_entree == NULL || fichier_sortie == NULL)
+    {
+        printf("Erreur : Impossible d'ouvrir les fichiers\n");
+        return;
+    }
+
+    // Lire l'en-tête
+    char format[3];
+    int largeur_originale, hauteur_originale, valeur_max;
+    fscanf(fichier_entree, "%s", format);
+    fscanf(fichier_entree, "%d %d", &largeur_originale, &hauteur_originale);
+    fscanf(fichier_entree, "%d", &valeur_max);
+
+    // Vérifier que les coordonnées de découpage sont valides
+    if (ligne_debut < 0 || ligne_fin >= hauteur_originale || 
+        colonne_debut < 0 || colonne_fin >= largeur_originale ||
+        ligne_debut > ligne_fin || colonne_debut > colonne_fin)
+    {
+        printf("Erreur : Coordonnees de decoupage invalides\n");
+        fclose(fichier_entree);
+        fclose(fichier_sortie);
+        return;
+    }
+
+    // Calculer les nouvelles dimensions
+    int nouvelle_largeur = colonne_fin - colonne_debut + 1;
+    int nouvelle_hauteur = ligne_fin - ligne_debut + 1;
+
+    // Écrire le nouvel en-tête
+    fprintf(fichier_sortie, "%s\n", format);
+    fprintf(fichier_sortie, "%d %d\n", nouvelle_largeur, nouvelle_hauteur);
+    fprintf(fichier_sortie, "%d\n", valeur_max);
+
+    // Lire et écrire seulement la partie découpée
+    Pixel pixel_courant;
+    for (int ligne = 0; ligne < hauteur_originale; ligne++)
+    {
+        for (int colonne = 0; colonne < largeur_originale; colonne++)
+        {
+            fscanf(fichier_entree, "%d %d %d", &pixel_courant.r, &pixel_courant.g, &pixel_courant.b);
+            
+            // Si le pixel est dans la zone à découper, l'écrire
+            if (ligne >= ligne_debut && ligne <= ligne_fin && 
+                colonne >= colonne_debut && colonne <= colonne_fin)
+            {
+                fprintf(fichier_sortie, "%d %d %d ", pixel_courant.r, pixel_courant.g, pixel_courant.b);
+            }
+        }
+    }
+
+    fclose(fichier_entree);
+    fclose(fichier_sortie);
+    
+    printf("Decoupage reussi ! Partie enregistree dans : %s\n", nom_fichier_sortie);
+    printf("Nouvelle taille : %d x %d pixels\n", nouvelle_largeur, nouvelle_hauteur);
+}
+int main()
+{
+    int choix;
+    do
+    {
+        printf("--Bienvenue dans la manipulation des images PPM--\n");
+        printf("1.Afficher l'image utilisee\n");
+        printf("2.Eclaircir les pixels\n");
+        printf("3.Passer en noir et blanc \n");
+        printf("4.Le negatif de l'image\n");
+        printf("5.Afficher la taille de l'image\n");
+        printf("6.Decouper et Afficher une partie de l'image\n");
+        printf("7.filtre median\n");
+        printf("0.Quitter\n");
+        printf("Entrer votre choix : ");
+        scanf("%d", &choix);
+
+        switch (choix)
+        {
+        case 1:
+            printf("voici l'image utiliser\n");
+            creer_image();
+            break;
+        case 0:
+            printf("Aurevoir\n");
+            break;
+        default:
+            printf("choix indisponible\n");
+            break;
+        }
+    } while (choix != 0);
     return 0;
 }
