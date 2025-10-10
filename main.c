@@ -2,6 +2,15 @@
 
 #include <stdlib.h>
 
+// Définition de la valeur maximale pour une composante de couleur 8 bits
+#define MAX_VALEUR 255
+
+/ Structure pour représenter une couleur (un pixel)
+typedef struct {
+    unsigned char rouge;
+    unsigned char vert;
+    unsigned char bleu;
+} Couleur;
 typedef struct
 {
     int hauteur;
@@ -60,6 +69,19 @@ void creer_image()
 void Filtre_Median(int tab[], int n){
 
 }
+
+//  la fonction pour créer le négatif d'une image
+Couleur creer_negatif(Couleur originale) {
+    Couleur negatif;
+    
+    // Le négatif est calculé par : MAX_VALEUR - valeur_originale
+    negatif.rouge = MAX_VALEUR - originale.rouge;
+    negatif.vert  = MAX_VALEUR - originale.vert;
+    negatif.bleu  = MAX_VALEUR - originale.bleu;
+    
+    return negatif;
+}
+
 
 // Fonction pour créer le négatif d'une image
 void creer_negatif_image()
@@ -219,6 +241,7 @@ int main()
             printf("voici l'image utiliser\n");
             creer_image();
             break;
+        case 3:
         case 0:
             printf("Aurevoir\n");
             break;
