@@ -23,10 +23,6 @@ typedef struct
     int b;
 }Pixel;
 
-//prototypes des fonctions
-void creer_image();
-void filtre_median(Pixel tab[], int n);
-
 void creer_image()
 {
     Image img;
@@ -442,23 +438,21 @@ int main(int argc, char* argv[])
             printf("voici l'image utiliser\n");
             creer_image();
             break;
-           
-            case 2:
+        case 2:
         eclaircir_image();  // Utilise image.ppm créé précédemment
             break;
-            
-            case 3:
+        case 3:
             printf("3.le negatif de l'image \n");
             break;
-            case 5:
+        case 5:
             printf("voici le négatif de l'image\n");
             creer_negatif_image();
             break;
-            case 6:
+        case 6:
             printf("voici votre image découper");
             decouper_partie_image();
             break;
-             case 7:
+            case 7:
             printf("Voici le filtre median\n");
             Filtre_Median();
 
