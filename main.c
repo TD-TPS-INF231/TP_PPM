@@ -2,6 +2,15 @@
 #include<string.h>
 #include <stdlib.h>
 
+// Définition de la valeur maximale pour une composante de couleur 8 bits
+#define MAX_VALEUR 255
+
+// Structure pour représenter une couleur (un pixel)
+typedef struct {
+    unsigned char rouge;
+    unsigned char vert;
+    unsigned char bleu;
+} Couleur;
 typedef struct
 {
     int hauteur;
@@ -137,6 +146,34 @@ void eclaircir_image() {
     printf("Fichier résultat: %s\n", nom_sortie);
     printf("Intensité appliquée: %d\n", intensite);
 }
+//  la fonction pour créer le négatif d'une image
+Couleur creer_negatif(Couleur originale) {
+    Couleur negatif;
+    
+    // Le négatif est calculé par : MAX_VALEUR - valeur_originale
+    negatif.rouge = MAX_VALEUR - originale.rouge;
+    negatif.vert  = MAX_VALEUR - originale.vert;
+    negatif.bleu  = MAX_VALEUR - originale.bleu;
+
+
+    Couleur couleur_originale = {200, 50, 100};
+
+    // 2. Appeler la fonction pour obtenir le négatif
+    Couleur couleur_negative = creer_negatif(couleur_originale);
+
+    
+
+    // 3. Afficher les résultats
+    printf("--- Composantes Couleurs ---\n");
+    printf("Originale (R, V, B) : (%u, %u, %u)\n", 
+           couleur_originale.rouge, couleur_originale.vert, couleur_originale.bleu);
+    printf("Négative (R, V, B) :  (%u, %u, %u)\n", 
+           couleur_negative.rouge, couleur_negative.vert, couleur_negative.bleu);
+
+    return 0;
+}
+
+
 // Fonction pour créer le négatif d'une image
 void creer_negatif_image()
 {
@@ -193,8 +230,8 @@ void creer_negatif_image()
     printf("Negatif cree avec succes dans : %s\n", nom_fichier_sortie);
 }
 
-// Fonction pour créer le négatif d'une image
-void creer_negatif_image()
+// Fonction pour découper une partie de l'image
+void decouper_partie_image()
 {
     char nom_fichier_entree[100];
     char nom_fichier_sortie[100];
@@ -283,6 +320,7 @@ void creer_negatif_image()
 }
 
 int main(int argc, char* argv[])
+
 {
     int choix;
     do
@@ -305,11 +343,13 @@ int main(int argc, char* argv[])
             printf("voici l'image utiliser\n");
             creer_image();
             break;
-           
-         case 2:
+            case 2:
         eclaircir_image();  // Utilise image.ppm créé précédemment
             break;
-         case 5:
+            case 3:
+            printf("3.le negatif de l'image \n");
+            break;
+            case 5:
             printf("voici le négatif de l'image\n");
             creer_negatif_image();
             break;
@@ -317,6 +357,7 @@ int main(int argc, char* argv[])
             printf("voici votre image découper");
             decouper_partie_image();
             break;
+
         case 0:
             printf("Aurevoir\n");
             break;
