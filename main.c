@@ -2,6 +2,15 @@
 #include<string.h>
 #include <stdlib.h>
 
+// Définition de la valeur maximale pour une composante de couleur 8 bits
+#define MAX_VALEUR 255
+
+// Structure pour représenter une couleur (un pixel)
+typedef struct {
+    unsigned char rouge;
+    unsigned char vert;
+    unsigned char bleu;
+} Couleur;
 typedef struct
 {
     int hauteur;
@@ -193,6 +202,90 @@ void creer_negatif_image()
     printf("Negatif cree avec succes dans : %s\n", nom_fichier_sortie);
 }
 
+//  la fonction pour créer le négatif d'une image
+Couleur creer_negatif(Couleur originale) {
+    Couleur negatif;
+    
+    // Le négatif est calculé par : MAX_VALEUR - valeur_originale
+    negatif.rouge = MAX_VALEUR - originale.rouge;
+    negatif.vert  = MAX_VALEUR - originale.vert;
+    negatif.bleu  = MAX_VALEUR - originale.bleu;
+
+
+    Couleur couleur_originale = {200, 50, 100};
+
+    // 2. Appeler la fonction pour obtenir le négatif
+    Couleur couleur_negative = creer_negatif(couleur_originale);
+
+    
+
+    // 3. Afficher les résultats
+    printf("--- Composantes Couleurs ---\n");
+    printf("Originale (R, V, B) : (%u, %u, %u)\n", 
+           couleur_originale.rouge, couleur_originale.vert, couleur_originale.bleu);
+    printf("Négative (R, V, B) :  (%u, %u, %u)\n", 
+           couleur_negative.rouge, couleur_negative.vert, couleur_negative.bleu);
+
+    return 0;
+}
+
+
+// Fonction pour créer le négatif d'une image
+void creer_negatif_image()
+{
+    char nom_fichier_entree[100];
+    char nom_fichier_sortie[100];
+    
+    printf("Entrer le nom du fichier image source : ");
+    scanf("%s", nom_fichier_entree);
+    printf("Entrer le nom du fichier resultat : ");
+    scanf("%s", nom_fichier_sortie);
+
+    FILE *fichier_entree = fopen(nom_fichier_entree, "r");
+    FILE *fichier_sortie = fopen(nom_fichier_sortie, "w");
+    
+    if (fichier_entree == NULL || fichier_sortie == NULL)
+    {
+        printf("Erreur : Impossible d'ouvrir les fichiers\n");
+        return;
+    }
+
+    // Lire l'en-tête du fichier PPM
+    char format[3];
+    int largeur, hauteur, valeur_max;
+    fscanf(fichier_entree, "%s", format);
+    fscanf(fichier_entree, "%d %d", &largeur, &hauteur);
+    fscanf(fichier_entree, "%d", &valeur_max);
+
+    // Écrire l'en-tête dans le fichier de sortie
+    fprintf(fichier_sortie, "%s\n", format);
+    fprintf(fichier_sortie, "%d %d\n", largeur, hauteur);
+    fprintf(fichier_sortie, "%d\n", valeur_max);
+
+    // Traiter chaque pixel pour créer le négatif
+    Pixel pixel_courant;
+    for (int i = 0; i < hauteur; i++)
+    {
+        for (int j = 0; j < largeur; j++)
+        {
+            fscanf(fichier_entree, "%d %d %d", &pixel_courant.r, &pixel_courant.g, &pixel_courant.b);
+            
+            // Calcul du négatif : soustraire de la valeur maximale
+            pixel_courant.r = valeur_max - pixel_courant.r;
+            pixel_courant.g = valeur_max - pixel_courant.g;
+            pixel_courant.b = valeur_max - pixel_courant.b;
+            
+            fprintf(fichier_sortie, "%d %d %d ", pixel_courant.r, pixel_courant.g, pixel_courant.b);
+        }
+        fprintf(fichier_sortie, "\n");
+    }
+
+    fclose(fichier_entree);
+    fclose(fichier_sortie);
+    
+    printf("Negatif cree avec succes dans : %s\n", nom_fichier_sortie);
+}
+
 // Fonction pour découper une partie de l'image
 void decouper_partie_image()
 {
@@ -272,7 +365,9 @@ void decouper_partie_image()
     printf("Decoupage reussi ! Partie enregistree dans : %s\n", nom_fichier_sortie);
     printf("Nouvelle taille : %d x %d pixels\n", nouvelle_largeur, nouvelle_hauteur);
 }
+
 int main(int argc, char* argv[])
+
 {
     int choix;
     do
@@ -295,9 +390,15 @@ int main(int argc, char* argv[])
             printf("voici l'image utiliser\n");
             creer_image();
             break;
+
             case 2:
         eclaircir_image();  // Utilise image.ppm créé précédemment
             break;
+            
+            case 3:
+            printf("3.le negatif de l'image \n");
+            break;
+
         case 0:
             printf("Aurevoir\n");
             break;
