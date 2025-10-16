@@ -146,62 +146,6 @@ void eclaircir_image() {
     printf("Fichier résultat: %s\n", nom_sortie);
     printf("Intensité appliquée: %d\n", intensite);
 }
-// Fonction pour créer le négatif d'une image
-void creer_negatif_image()
-{
-    char nom_fichier_entree[100];
-    char nom_fichier_sortie[100];
-    
-    printf("Entrer le nom du fichier image source : ");
-    scanf("%s", nom_fichier_entree);
-    printf("Entrer le nom du fichier resultat : ");
-    scanf("%s", nom_fichier_sortie);
-
-    FILE *fichier_entree = fopen(nom_fichier_entree, "r");
-    FILE *fichier_sortie = fopen(nom_fichier_sortie, "w");
-    
-    if (fichier_entree == NULL || fichier_sortie == NULL)
-    {
-        printf("Erreur : Impossible d'ouvrir les fichiers\n");
-        return;
-    }
-
-    // Lire l'en-tête du fichier PPM
-    char format[3];
-    int largeur, hauteur, valeur_max;
-    fscanf(fichier_entree, "%s", format);
-    fscanf(fichier_entree, "%d %d", &largeur, &hauteur);
-    fscanf(fichier_entree, "%d", &valeur_max);
-
-    // Écrire l'en-tête dans le fichier de sortie
-    fprintf(fichier_sortie, "%s\n", format);
-    fprintf(fichier_sortie, "%d %d\n", largeur, hauteur);
-    fprintf(fichier_sortie, "%d\n", valeur_max);
-
-    // Traiter chaque pixel pour créer le négatif
-    Pixel pixel_courant;
-    for (int i = 0; i < hauteur; i++)
-    {
-        for (int j = 0; j < largeur; j++)
-        {
-            fscanf(fichier_entree, "%d %d %d", &pixel_courant.r, &pixel_courant.g, &pixel_courant.b);
-            
-            // Calcul du négatif : soustraire de la valeur maximale
-            pixel_courant.r = valeur_max - pixel_courant.r;
-            pixel_courant.g = valeur_max - pixel_courant.g;
-            pixel_courant.b = valeur_max - pixel_courant.b;
-            
-            fprintf(fichier_sortie, "%d %d %d ", pixel_courant.r, pixel_courant.g, pixel_courant.b);
-        }
-        fprintf(fichier_sortie, "\n");
-    }
-
-    fclose(fichier_entree);
-    fclose(fichier_sortie);
-    
-    printf("Negatif cree avec succes dans : %s\n", nom_fichier_sortie);
-}
-
 //  la fonction pour créer le négatif d'une image
 Couleur creer_negatif(Couleur originale) {
     Couleur negatif;
@@ -291,18 +235,9 @@ void decouper_partie_image()
 {
     char nom_fichier_entree[100];
     char nom_fichier_sortie[100];
-    int ligne_debut, ligne_fin, colonne_debut, colonne_fin;
     
     printf("Entrer le nom du fichier image source : ");
     scanf("%s", nom_fichier_entree);
-    printf("Entrer la ligne de debut : ");
-    scanf("%d", &ligne_debut);
-    printf("Entrer la ligne de fin : ");
-    scanf("%d", &ligne_fin);
-    printf("Entrer la colonne de debut : ");
-    scanf("%d", &colonne_debut);
-    printf("Entrer la colonne de fin : ");
-    scanf("%d", &colonne_fin);
     printf("Entrer le nom du fichier resultat : ");
     scanf("%s", nom_fichier_sortie);
 
@@ -315,23 +250,41 @@ void decouper_partie_image()
         return;
     }
 
-    // Lire l'en-tête
+    // Lire l'en-tête du fichier PPM
     char format[3];
-    int largeur_originale, hauteur_originale, valeur_max;
+    int largeur, hauteur, valeur_max;
     fscanf(fichier_entree, "%s", format);
-    fscanf(fichier_entree, "%d %d", &largeur_originale, &hauteur_originale);
+    fscanf(fichier_entree, "%d %d", &largeur, &hauteur);
     fscanf(fichier_entree, "%d", &valeur_max);
 
-    // Vérifier que les coordonnées de découpage sont valides
-    if (ligne_debut < 0 || ligne_fin >= hauteur_originale || 
-        colonne_debut < 0 || colonne_fin >= largeur_originale ||
-        ligne_debut > ligne_fin || colonne_debut > colonne_fin)
+    // Écrire l'en-tête dans le fichier de sortie
+    fprintf(fichier_sortie, "%s\n", format);
+    fprintf(fichier_sortie, "%d %d\n", largeur, hauteur);
+    fprintf(fichier_sortie, "%d\n", valeur_max);
+
+    // Traiter chaque pixel pour créer le négatif
+    Pixel pixel_courant;
+    for (int i = 0; i < hauteur; i++)
     {
-        printf("Erreur : Coordonnees de decoupage invalides\n");
-        fclose(fichier_entree);
-        fclose(fichier_sortie);
-        return;
+        for (int j = 0; j < largeur; j++)
+        {
+            fscanf(fichier_entree, "%d %d %d", &pixel_courant.r, &pixel_courant.g, &pixel_courant.b);
+            
+            // Calcul du négatif : soustraire de la valeur maximale
+            pixel_courant.r = valeur_max - pixel_courant.r;
+            pixel_courant.g = valeur_max - pixel_courant.g;
+            pixel_courant.b = valeur_max - pixel_courant.b;
+            
+            fprintf(fichier_sortie, "%d %d %d ", pixel_courant.r, pixel_courant.g, pixel_courant.b);
+        }
+        fprintf(fichier_sortie, "\n");
     }
+
+    fclose(fichier_entree);
+    fclose(fichier_sortie);
+    
+    printf("Negatif cree avec succes dans : %s\n", nom_fichier_sortie);
+}
 
     // Calculer les nouvelles dimensions
     int nouvelle_largeur = colonne_fin - colonne_debut + 1;
@@ -390,13 +343,19 @@ int main(int argc, char* argv[])
             printf("voici l'image utiliser\n");
             creer_image();
             break;
-
             case 2:
         eclaircir_image();  // Utilise image.ppm créé précédemment
             break;
-            
             case 3:
             printf("3.le negatif de l'image \n");
+            break;
+            case 5:
+            printf("voici le négatif de l'image\n");
+            creer_negatif_image();
+            break;
+            case 6:
+            printf("voici votre image découper");
+            decouper_partie_image();
             break;
 
         case 0:
