@@ -22,6 +22,13 @@ typedef struct
     int g;
     int b;
 }Pixel;
+//prototypes fonctions
+void creer_image();
+void eclaircir_image();
+Couleur creer_negatif(Couleur originale);
+void creer_negatif_image();
+void decouper_partie_image();
+void Filtre_Median();
 
 void creer_image()
 {
@@ -145,6 +152,7 @@ void eclaircir_image() {
     printf("Fichier résultat: %s\n", nom_sortie);
     printf("Intensité appliquée: %d\n", intensite);
 }
+
 //  la fonction pour créer le négatif d'une image
 Couleur creer_negatif(Couleur originale) {
     Couleur negatif;
@@ -153,16 +161,8 @@ Couleur creer_negatif(Couleur originale) {
     negatif.rouge = MAX_VALEUR - originale.rouge;
     negatif.vert  = MAX_VALEUR - originale.vert;
     negatif.bleu  = MAX_VALEUR - originale.bleu;
-
-
     Couleur couleur_originale = {200, 50, 100};
-
-    // 2. Appeler la fonction pour obtenir le négatif
     Couleur couleur_negative = creer_negatif(couleur_originale);
-
-    
-
-    // 3. Afficher les résultats
     printf("--- Composantes Couleurs ---\n");
     printf("Originale (R, V, B) : (%u, %u, %u)\n", 
            couleur_originale.rouge, couleur_originale.vert, couleur_originale.bleu);
